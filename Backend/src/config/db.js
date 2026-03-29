@@ -8,3 +8,5 @@ async function connectDb(){
         console.log("Mongodb connection failed",err);
     }
 }
+
+export default connectDb;
