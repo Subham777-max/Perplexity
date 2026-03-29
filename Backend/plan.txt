@@ -1,0 +1,4 @@
+- Authentication system
+- Chat with Ai
+- Chat history
+- Ai with internet search features
