@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema(
             minlength: 6,
             select: false
         },
+        emailVerificationToken: {
+            type: String,
+            default: null,
+        },
         verified: {
             type: Boolean,
             default: false,

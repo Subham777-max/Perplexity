@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getMe, login, register, verifyEmail } from "../controllers/auth.controller.js";
+import { getMe, login, register, resendEmail, verifyEmail } from "../controllers/auth.controller.js";
 import { loginValidator, registerValidator } from "../validator/auth.validator.js";
 import { authUser } from "../middleware/auth.middleware.js";
 
@@ -18,6 +18,13 @@ authRouter.post("/register",registerValidator,register);
  * @access Public
  */
 authRouter.get("/verify-email/:token", verifyEmail);
+
+/**
+ * @route GET /api/auth/resend-verification
+ * @desc Resend email verification token
+ * @access Public
+ */
+authRouter.get("/resend-verification", resendEmail);
 
 /**
  * @route POST /api/auth/login
