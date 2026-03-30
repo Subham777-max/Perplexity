@@ -5,7 +5,7 @@ const validate = (req, res, next) => {
 
   if (!errors.isEmpty()) {
     const err = new Error("Validation Error");
-    err.statusCode = 400;
+    err.status = 400;
     err.errors = errors.array();
     return next(err);
   }
