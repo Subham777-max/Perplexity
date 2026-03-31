@@ -10,6 +10,7 @@
 	--text-tertiary: #807A6F;
 
 	--border-color: #D9D5CA;
+	--custom-primary-color: #D97757;
 }
 
 @layer utilities {
@@ -40,13 +41,31 @@
 	.border-theme {
 		border-color: var(--border-color);
 	}
-}
 
+	.bg-custom-primary {
+		background-color: var(--custom-primary-color);
+	}
+
+	.text-custom-primary {
+		color: var(--custom-primary-color);
+	}
+
+	.border-custom-primary {
+		border-color: var(--custom-primary-color);
+	}
+
+	.ring-custom-primary {
+		--tw-ring-color: var(--custom-primary-color);
+	}
+}
 
 .bg-theme-gradient {
 	background-image: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
 }
 
+body{
+  background-color: var(--primary-color);
+}
 
 .no-scrollbar {
 	-ms-overflow-style: none;
