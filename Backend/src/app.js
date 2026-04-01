@@ -4,6 +4,7 @@ import cors from "cors";
 import morgan from "morgan";
 import errorHandler from "./middleware/errorHandler.middleware.js";
 import authRouter from "./routes/auth.routes.js";
+import chatRouter from "./routes/chat.routes.js";
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
 
 app.use("/api/auth",authRouter);
+app.use("/api/chats",chatRouter);
 
 app.use(errorHandler)
 export default app;
