@@ -1,15 +1,19 @@
-import React ,{ useEffect } from 'react'
+import React, { useEffect } from 'react';
 import { useChat } from '../hooks/useChat';
 import { useAuth } from '../../Auth/hooks/useAuth';
+import DashboardLayout from '../components/Layout/DashboardLayout';
+
 function Dashboard() {
   const { user } = useAuth();
   const { initializeSocketConnection } = useChat();
-  useEffect(()=>{
+  
+  useEffect(() => {
     initializeSocketConnection();
-  },[initializeSocketConnection])
+  }, [initializeSocketConnection]);
+
   return (
-    <div>Dashboard</div>
-  )
+    <DashboardLayout />
+  );
 }
 
-export default Dashboard
+export default Dashboard;
