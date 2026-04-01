@@ -1,14 +1,43 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-
-const model = new ChatGoogleGenerativeAI({
+import { ChatMistralAI } from "@langchain/mistralai";
+import { HumanMessage,SystemMessage } from "langchain";
+const geminiModel = new ChatGoogleGenerativeAI({
   model: "gemini-2.5-flash-lite",
   apiKey: process.env.GEMINI_API_KEY,
 });
 
-export async function testAi(){
-    model.invoke("What is the ai explain under 100 words?").then((response) => {
-        console.log(response.text);
-    }).catch((err) => {
-        console.error(err);
-    });
+const mistralModel = new ChatMistralAI({
+    model: "mistral-small-latest",
+    temperature: 0
+});
+
+
+export async function generateResponse(message) {
+    const response = await geminiModel.invoke([
+        new HumanMessage(message)
+    ])
+    return response.text;
+}
+
+export async function generateChatTitle(message){
+    const response = await mistralModel.invoke([
+        new SystemMessage(`
+            You are an AI assistant that generates short, clear, and meaningful titles for chat conversations.
+
+            The user will provide the first message of a conversation. Based on that, generate a concise title (2-3 words) that captures the main topic or intent.
+
+            Guidelines:
+            - Keep it brief (strictly 2-3 words)
+            - Focus on the core subject or goal
+            - Avoid filler words (e.g., "help with", "question about")
+            - Use simple, natural language
+            - Do not include punctuation unless necessary
+
+            Only return the title, nothing else.
+
+            User message: "${message}"
+        `),
+        new HumanMessage(`Generate a title for the above conversation starter based on the following first message: ${message}`)
+    ]);
+    return response.text;
 }
