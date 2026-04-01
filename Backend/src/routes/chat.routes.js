@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { sendMessage,getChats,getChatMessages } from '../controllers/chat.controller.js';
+import { sendMessage,getChats,getChatMessages ,deleteChat } from '../controllers/chat.controller.js';
 import { authUser } from '../middleware/auth.middleware.js';
 const chatRouter = Router();
 
@@ -23,5 +23,13 @@ chatRouter.get("/", authUser, getChats);
  * @access Private
  */
 chatRouter.get("/:chatId/messages", authUser, getChatMessages);
+
+/**
+ * @route POST /api/chats/delete/:chatId
+ * @desc Delete a chat and its messages
+ * @access Private
+ */
+chatRouter.post("/delete/:chatId", authUser, deleteChat);
+
 
 export default chatRouter;
