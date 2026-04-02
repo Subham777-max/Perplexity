@@ -6,7 +6,7 @@ const MessageList = ({ messages, messagesEndRef }) => {
       {messages.map((msg, index) => (
         <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
           <div className={`max-w-[85%] px-5 py-3 rounded-2xl ${msg.role === 'user' ? 'bg-secondary text-text-primary' : 'bg-transparent text-text-primary'}`}>
-            {msg.content}
+            {typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content)}
           </div>
         </div>
       ))}
