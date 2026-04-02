@@ -46,24 +46,40 @@ const MainContent = ({ toggleSidebar, isSidebarOpen }) => {
     <div className="flex flex-col h-full bg-tertiary relative text-primary w-full overflow-hidden">
       <ChatHeader toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
-      {/* Main Chat Area */}
-      <main className={`flex-1 overflow-y-auto no-scrollbar flex flex-col p-4 lg:px-10 w-full mx-auto relative ${messages.length === 0 ? 'justify-center max-w-3xl' : 'max-w-4xl'}`}>
-        
-        {messages.length === 0 ? (
+      {messages.length === 0 ? (
+        /* Original layout when no messages */
+        <main className={`flex-1 overflow-y-auto no-scrollbar flex flex-col p-4 lg:px-10 w-full mx-auto relative justify-center max-w-3xl`}>
           <ChatGreeting greeting={getGreeting()} />
-        ) : (
-          <MessageList messages={messages} messagesEndRef={messagesEndRef} />
-        )}
-
-        <ChatInput 
-          inputText={inputText}
-          setInputText={setInputText}
-          handleSendMessage={onSubmitMessage}
-          isProEnabled={isProEnabled}
-          setIsProEnabled={setIsProEnabled}
-          isMessagesEmpty={messages.length === 0}
-        />
-      </main>
+          <ChatInput 
+            inputText={inputText}
+            setInputText={setInputText}
+            handleSendMessage={onSubmitMessage}
+            isProEnabled={isProEnabled}
+            setIsProEnabled={setIsProEnabled}
+            isMessagesEmpty={true}
+          />
+        </main>
+      ) : (
+        /* New layout with fixed input at bottom when messages exist */
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <main className="flex-1 overflow-y-auto no-scrollbar flex flex-col p-4 lg:px-10 w-full mx-auto relative max-w-4xl">
+            <MessageList messages={messages} messagesEndRef={messagesEndRef} />
+          </main>
+          
+          <div className="flex-shrink-0 border-t border-theme bg-tertiary p-4 lg:px-10 w-full flex justify-center">
+            <div className="w-full max-w-3xl">
+              <ChatInput 
+                inputText={inputText}
+                setInputText={setInputText}
+                handleSendMessage={onSubmitMessage}
+                isProEnabled={isProEnabled}
+                setIsProEnabled={setIsProEnabled}
+                isMessagesEmpty={false}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
