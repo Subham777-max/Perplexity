@@ -45,7 +45,7 @@ export async function sendMessage(req, res, next) {
 
 export async function getChats(req, res, next) {
     try{
-        const chats = await chatModel.find({ user: req.user.id })
+        const chats = await chatModel.find({ user: req.user.id }).sort({ updatedAt: -1 });
         res.status(200).json({
             message: "Chats retrieved successfully",
             chats
