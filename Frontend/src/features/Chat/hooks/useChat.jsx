@@ -13,20 +13,20 @@ export function useChat(){
             const data = await sendMessage(chatId, message);
             const { chat , message: aimessage } = data;
             dispatch(createNewChat({
-                chatId: chat._id,
-                title: chat.title,
+                chatId: chat?._id || chatId,
+                title: chat?.title,
             }));
             dispatch(addNewMessages({
-                chatId: chat._id,
+                chatId: chat?._id || chatId,
                 content: message,
                 role: "user",
             }));
             dispatch(addNewMessages({
-                chatId: chat._id,
+                chatId: chat?._id || chatId,
                 content: aimessage.content ,
                 role: aimessage.role,
             }));
-            dispatch(setCurrentChatId(chat?._id));
+            dispatch(setCurrentChatId(chat?._id || chatId));
         }catch(err){
             dispatch(setError(err.message));
         }finally{
