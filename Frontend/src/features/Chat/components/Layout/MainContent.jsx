@@ -1,29 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import { useAuth } from '../../../Auth/hooks/useAuth';
+import { useChat } from '../../hooks/useChat';
 import ChatHeader from '../ChatHeader';
 import ChatGreeting from '../ChatGreeting';
 import MessageList from '../MessageList';
 import ChatInput from '../ChatInput';
 
 const MainContent = ({ toggleSidebar, isSidebarOpen }) => {
-  const [messages, setMessages] = useState([
-    { role: 'user', content: 'Explain Quantum Computing' },
-    { role: 'ai', content: 'Quantum computing is a rapidly-emerging technology that harnesses the laws of quantum mechanics to solve problems too complex for classical computers.' },
-    { role: 'user', content: 'What are qubits?' },
-    { role: 'ai', content: 'A qubit (short for quantum bit) is the basic unit of information in quantum computing. Unlike bits which can only store 0 or 1, qubits can exist in a superposition of both states.' }
-  ]);
+  const { currentChatId, chats } = useSelector((state) => state.chat);
+  const messages = currentChatId && chats[currentChatId] ? chats[currentChatId].messages : [];
+  
   const [inputText, setInputText] = useState('');
   const [isProEnabled, setIsProEnabled] = useState(false);
   const messagesEndRef = useRef(null);
   const { user } = useAuth() || {};
-
+  const { handleSendMessage } = useChat();
+  console.log(chats)
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [chats, currentChatId]);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -33,15 +33,13 @@ const MainContent = ({ toggleSidebar, isSidebarOpen }) => {
     return `Good ${timeOfDay}, ${user?.username?.split(' ')[0] || 'there'}`;
   };
 
-  const handleSendMessage = (e) => {
+  const onSubmitMessage = async (e) => {
     e.preventDefault();
     if (!inputText.trim()) return;
     
-    // Optimistically add user message for layout testing
-    setMessages(prev => [...prev, { role: 'user', content: inputText }]);
-    // Backend integration placeholder
-    console.log("Sending:", inputText, "Pro:", isProEnabled);
+    const messageToSend = inputText;
     setInputText('');
+    await handleSendMessage(currentChatId, messageToSend);
   };
 
   return (
@@ -60,7 +58,7 @@ const MainContent = ({ toggleSidebar, isSidebarOpen }) => {
         <ChatInput 
           inputText={inputText}
           setInputText={setInputText}
-          handleSendMessage={handleSendMessage}
+          handleSendMessage={onSubmitMessage}
           isProEnabled={isProEnabled}
           setIsProEnabled={setIsProEnabled}
           isMessagesEmpty={messages.length === 0}
