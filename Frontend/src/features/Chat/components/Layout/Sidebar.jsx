@@ -1,8 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '../../../Auth/hooks/useAuth';
+import { useChat } from '../../hooks/useChat';
+import { useSelector } from 'react-redux';
+
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const { user } = useAuth() || {};
+  const { handleGetChats , handleOpenChat } = useChat();
+  const { chats } = useSelector((state) => state.chat);
+  console.log(chats)
+  useEffect(()=>{
+    handleGetChats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[])
+
+  function openChat(chatId){
+    handleOpenChat(chatId);
+  }
 
   return (
     <aside
@@ -52,14 +66,13 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       <div className="flex-1 overflow-y-auto no-scrollbar w-full mb-4">
         <p className="text-xs font-semibold text-text-tertiary mb-3 px-3 uppercase tracking-wider">Today</p>
         <div className="space-y-1">
-          {/* Mock Chats - Will be mapped from backend chat.model */}
-          {[
-            'Understanding LangChain and Mistral', 
-            'Socket.io real-time chat setup', 
-            'React layout components test layout title truncation'
-          ].map((chat, idx) => (
-            <button key={idx} className="block w-full text-left px-3 py-2 text-sm text-text-secondary hover:bg-secondary hover:text-text-primary rounded-lg truncate transition-all cursor-pointer">
-              {chat}
+          {chats && Object.values(chats).map((chat, idx) => (
+            <button 
+              key={idx} 
+              className="block w-full text-left px-3 py-2 text-sm text-text-secondary hover:bg-(--secondary-color) hover:text-text-primary rounded-lg truncate transition-all cursor-pointer"
+              onClick={() => openChat(chat.id)}
+            >
+              {chat.title || `Chat ${idx + 1}`}
             </button>
           ))}
         </div>
