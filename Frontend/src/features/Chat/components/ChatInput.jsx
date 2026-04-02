@@ -12,7 +12,7 @@ const ChatInput = ({
     <div className="w-full flex shrink-0 flex-col items-center">
       <form onSubmit={handleSendMessage} className="w-full border border-theme rounded-2xl p-3 sm:p-4 bg-tertiary shadow-sm focus-within:shadow-md focus-within:border-theme transition-all duration-300 relative group">
         <textarea
-          className="w-full bg-transparent resize-none border-none outline-none text-text-primary placeholder-text-tertiary overflow-hidden focus:ring-0 text-base sm:text-lg min-h-12.5 max-h-50"
+          className="w-full bg-transparent resize-none border-none outline-none text-text-primary placeholder-text-tertiary overflow-y-auto focus:ring-0 text-base sm:text-lg min-h-12.5 max-h-50"
           placeholder={isMessagesEmpty ? "Ask anything..." : "Ask a follow up..."}
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
