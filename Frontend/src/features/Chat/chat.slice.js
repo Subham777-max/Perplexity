@@ -19,9 +19,9 @@ const chatSlice = createSlice({
             };
         },
         addNewMessages: (state, action) => {
-            const { chatId, content , role } = action.payload;
+            const { chatId, content , role , lastUpdated } = action.payload;
             state.chats[chatId].messages.push({ content, role });
-            state.chats[chatId].lastUpdated = new Date().toISOString();
+            state.chats[chatId].lastUpdated = lastUpdated || new Date().toISOString();
         },
         setChats: (state, action) => {
             state.chats = action.payload;
