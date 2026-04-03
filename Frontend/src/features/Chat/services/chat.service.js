@@ -1,7 +1,7 @@
 import api from "../../API/api";
 
 export async function sendMessage(chatId, message) {
-    const res = await api.post("/chats/message", { chatId, message });
+    const res = await api.post("/chats/message", { chat:chatId, message });
     return res.data;
 }
 
