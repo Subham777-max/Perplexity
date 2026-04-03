@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
-
+import remarkGfm from 'remark-gfm';
 export function useMarkdownRenderer(content) {
   return useMemo(() => {
     if (!content || typeof content !== 'string') {
@@ -12,6 +12,7 @@ export function useMarkdownRenderer(content) {
     return (
   <div className="markdown-rendered">
     <ReactMarkdown 
+      remarkPlugins={[remarkGfm]}
       components={{
         code: ({ inline, className, children }) => {
           const match = /language-(\w+)/.exec(className || '');
