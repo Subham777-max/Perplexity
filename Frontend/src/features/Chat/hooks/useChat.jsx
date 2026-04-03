@@ -12,10 +12,12 @@ export function useChat(){
         try{
             const data = await sendMessage(chatId, message);
             const { chat , message: aimessage } = data;
-            dispatch(createNewChat({
-                chatId: chat?._id || chatId,
-                title: chat?.title,
-            }));
+            if(!chatId){
+                dispatch(createNewChat({
+                    chatId: chat?._id || chatId,
+                    title: chat?.title,
+                }));
+            }
             dispatch(addNewMessages({
                 chatId: chat?._id || chatId,
                 content: message,
