@@ -19,8 +19,6 @@ export function ThemeToggle() {
         text-text-secondary hover:text-text-primary
         bg-tertiary hover:bg-secondary border-theme
         
-        focus:outline-none focus:ring-2 focus:ring-offset-2
-        focus:ring-custom-primary
         
         active:scale-95
       "
