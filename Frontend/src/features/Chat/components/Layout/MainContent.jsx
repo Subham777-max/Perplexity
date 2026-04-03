@@ -66,7 +66,7 @@ const MainContent = ({ toggleSidebar, isSidebarOpen }) => {
             <MessageList messages={messages} messagesEndRef={messagesEndRef} />
           </main>
           
-          <div className="flex-shrink-0 border-t border-theme bg-tertiary p-4 lg:px-10 w-full flex justify-center">
+          <div className="shrink-0 border-t border-theme bg-tertiary p-4 lg:px-10 w-full flex justify-center">
             <div className="w-full max-w-3xl">
               <ChatInput 
                 inputText={inputText}
