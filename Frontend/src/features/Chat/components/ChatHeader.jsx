@@ -1,4 +1,5 @@
 import React from 'react';
+import { ThemeToggle } from '../../Theme/components/ThemeToggle';
 
 const ChatHeader = ({ toggleSidebar, isSidebarOpen }) => {
   return (
@@ -17,11 +18,9 @@ const ChatHeader = ({ toggleSidebar, isSidebarOpen }) => {
         )}
       </div>
       
-      {/* Top Right Action Button */}
-      <div className="flex items-center space-x-2">
-        <button className="px-3 py-1.5 text-sm font-medium text-text-secondary hover:bg-secondary border border-theme rounded-lg transition-all shadow-sm cursor-pointer">
-          Default Model • <span className="hover:underline text-text-primary transition-all">Change</span>
-        </button>
+      {/* Top Right Action Buttons */}
+      <div className="flex items-center space-x-3">
+        <ThemeToggle />
       </div>
     </header>
   );
