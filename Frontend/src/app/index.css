@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
-:root {
+/* Light Mode (default) */
+:root,
+body.light {
 	--primary-color: #FAF9F5;
 	--secondary-color: #F0EEE6;
 	--tertiary-color: #FFFFFF;
@@ -11,6 +13,25 @@
 
 	--border-color: #D9D5CA;
 	--custom-primary-color: #D97757;
+}
+
+/* Dark Mode */
+body.dark {
+	--primary-color: #262624;
+	--secondary-color: #141413;
+	--tertiary-color: #30302E;
+
+	--text-primary: #F5F5F1;
+	--text-secondary: #B8B4AC;
+	--text-tertiary: #8C8680;
+
+	--border-color: #3D3A37;
+	--custom-primary-color: #D97757;
+}
+
+/* Smooth transition for theme changes */
+body {
+	transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 @layer utilities {
