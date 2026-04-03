@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { useAuth } from '../../../Auth/hooks/useAuth';
 import { useChat } from '../../hooks/useChat';
 import { useSelector } from 'react-redux';
+import { setCurrentChatId } from '../../chat.slice';
+import { useDispatch } from 'react-redux';
 
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
@@ -13,6 +15,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     handleGetChats();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
+
+  const dispatch = useDispatch();
 
   function openChat(chatId){
     handleOpenChat(chatId);
@@ -42,7 +46,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
       {/* Action Buttons */}
       <div className="space-y-2 mb-6 w-full">
-        <button className="flex items-center justify-between w-full text-left px-3 py-2.5 text-text-primary rounded-lg border border-theme hover:bg-secondary transition-all cursor-pointer group">
+        <button onClick={()=>dispatch(setCurrentChatId(null))} className="flex items-center justify-between w-full text-left px-3 py-2.5 text-text-primary rounded-lg border border-theme hover:bg-secondary transition-all cursor-pointer group">
           <div className="flex items-center space-x-3">
              <span className="font-medium text-sm truncate">New Thread</span>
           </div>
