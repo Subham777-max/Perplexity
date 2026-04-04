@@ -147,10 +147,25 @@ export function useChat(){
         }
     }
 
+    async function handleDeleteChat(chatId) {
+        try {
+            await deleteChat(chatId);
+            // Optionally: refresh chats list after deletion
+            await handleGetChats();
+            // If the deleted chat was open, clear the current chat
+            dispatch(setCurrentChatId(null));
+            console.log("Chat deleted successfully:", chatId);
+        } catch (err) {
+            console.error("Delete chat error:", err);
+            dispatch(setError(err.message || "Failed to delete chat"));
+        }
+    }
+
     return{
         handleSendMessage,
         handleGetChats,
         handleOpenChat,
+        handleDeleteChat,
         isSocketReady,
     }
 }

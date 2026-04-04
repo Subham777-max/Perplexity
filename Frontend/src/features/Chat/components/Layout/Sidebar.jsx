@@ -1,28 +1,67 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../../../Auth/hooks/useAuth';
 import { useChat } from '../../hooks/useChat';
 import { useSelector } from 'react-redux';
 import { setCurrentChatId, setViewMode } from '../../chat.slice';
 import { useDispatch } from 'react-redux';
 import { useIsMobile } from '../../../../hooks/useIsMobile';
+import { MoreVertical, Trash2 } from 'lucide-react';
 
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const { user } = useAuth() || {};
   const isMobile = useIsMobile();
-  const { handleGetChats , handleOpenChat } = useChat();
+  const { handleGetChats , handleOpenChat, handleDeleteChat } = useChat();
   const { chats } = useSelector((state) => state.chat);
+  const [chatToDelete, setChatToDelete] = useState(null);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, right: 0 });
+  const menuButtonRef = useRef(null);
+  
   console.log(chats)
   useEffect(()=>{
     handleGetChats();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
 
+  // Close menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside() {
+      setOpenMenuId(null);
+    }
+    if (openMenuId) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [openMenuId]);
+
   const dispatch = useDispatch();
 
   function openChat(chatId){
     dispatch(setViewMode('chat'));
     handleOpenChat(chatId);
+  }
+
+  function handleDeleteConfirm(chatId, e) {
+    e.stopPropagation();
+    setChatToDelete(chatId);
+    setShowConfirm(true);
+    setOpenMenuId(null);
+  }
+
+  function confirmDelete() {
+    if (chatToDelete) {
+      handleDeleteChat(chatToDelete);
+      setShowConfirm(false);
+      setChatToDelete(null);
+      setOpenMenuId(null);
+    }
+  }
+
+  function cancelDelete() {
+    setShowConfirm(false);
+    setChatToDelete(null);
   }
   // console.log('Sidebar render - isOpen:', isOpen, 'isMobile:', isMobile);
   return (
@@ -69,22 +108,67 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
       {/* Threads / Recents */}
       <div className="flex-1 overflow-y-auto no-scrollbar w-full mb-4">
-        <p className="text-xs font-semibold text-text-tertiary mb-3 px-3 uppercase tracking-wider">Today</p>
+        <p className="text-xs font-semibold text-text-tertiary mb-3 px-3 uppercase tracking-wider">Your Chats</p>
         <div className="space-y-1">
           {chats && Object.values(chats).map((chat, idx) => (
-            <button 
+            <div 
               key={idx} 
-              className="block w-full text-left px-3 py-2 text-sm text-text-secondary hover:bg-(--secondary-color) hover:text-text-primary rounded-lg truncate transition-all cursor-pointer"
-              onClick={() => {
-                openChat(chat.id);
-                isMobile && toggleSidebar();
-              }}
+              className="group flex gap-2 relative w-full text-left px-2 py-1 text-sm text-text-secondary hover:bg-(--secondary-color) hover:text-text-primary rounded-lg truncate transition-all cursor-pointer"
             >
-              {chat.title || `Chat ${idx + 1}`}
-            </button>
+              <button 
+                className="flex-1 text-left px-1 py-1 cursor-pointer text-sm text-text-secondary hover:text-text-primary truncate"
+                onClick={() => {
+                  openChat(chat.id);
+                  isMobile && toggleSidebar();
+                }}
+              >
+                {chat.title || `Chat ${idx + 1}`}
+              </button>
+              <button 
+                ref={openMenuId === chat.id ? menuButtonRef : null}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (openMenuId === chat.id) {
+                    setOpenMenuId(null);
+                  } else {
+                    setOpenMenuId(chat.id);
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const sidebarRect = e.currentTarget.closest('aside').getBoundingClientRect();
+                    setMenuPosition({
+                      top: rect.bottom - sidebarRect.top,
+                      right: sidebarRect.right - rect.right
+                    });
+                  }
+                }}
+                className="shrink-0 p-1 cursor-pointer text-text-secondary opacity-0 group-hover:opacity-100 hover:text-text-primary hover:bg-theme/30 rounded-md transition-all"
+                title="Chat options"
+              >
+                <MoreVertical size={18} />
+              </button>
+            </div>
           ))}
         </div>
       </div>
+
+      {/* Dropdown Menu - Fixed positioning to escape scroll container */}
+      {openMenuId && (
+        <div 
+          className="fixed bg-tertiary border border-theme rounded-lg shadow-lg py-1 z-40 w-40"
+          style={{
+            top: `${(document.querySelector('aside')?.getBoundingClientRect().top || 0) + menuPosition.top}px`,
+            right: `${(window.innerWidth - (document.querySelector('aside')?.getBoundingClientRect().right || 0)) + menuPosition.right}px`,
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button 
+            onClick={(e) => handleDeleteConfirm(openMenuId, e)}
+            className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-500/10 transition-colors flex items-center space-x-2"
+          >
+            <Trash2 size={16} />
+            <span>Delete</span>
+          </button>
+        </div>
+      )}
 
       {/* Footer User Profile */}
       <div className="mt-auto w-full flex items-center justify-between">
@@ -101,6 +185,30 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           </svg>
         </button>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-100">
+          <div className="bg-tertiary rounded-lg shadow-lg p-6 max-w-sm mx-4 border border-theme">
+            <h3 className="text-text-primary font-semibold text-lg mb-2">Delete Chat?</h3>
+            <p className="text-text-secondary text-sm mb-6">This action cannot be undone. Are you sure you want to delete this chat?</p>
+            <div className="flex justify-end space-x-3">
+              <button 
+                onClick={cancelDelete}
+                className="px-4 py-2 text-sm text-text-primary hover:bg-secondary rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmDelete}
+                className="px-4 py-2 text-sm bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors font-medium"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </aside>
   );
 };
