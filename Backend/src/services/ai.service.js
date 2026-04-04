@@ -37,15 +37,25 @@ export async function generateResponse(messages , isStream = false){
             return new AIMessage(msg.content);
         }
     })
-    if(isStream){
-        return await agent.stream({
-            messages: formattedMessages,
-        })
-    }else{
-        const response = await agent.invoke({ 
-            messages: formattedMessages,
-        });
-        return response.messages[response.messages.length - 1].text;
+    
+    try {
+        if(isStream){
+            console.log("Starting model stream with", formattedMessages.length, "messages");
+            // Use the model's stream method for token-level streaming
+            const stream = await mistralModel.stream(formattedMessages);
+            console.log("Stream initialized");
+            return stream;
+        }else{
+            console.log("Starting agent invoke with", formattedMessages.length, "messages");
+            const response = await agent.invoke({ 
+                messages: formattedMessages,
+            });
+            console.log("Invoke complete");
+            return response.messages[response.messages.length - 1].text;
+        }
+    } catch (err) {
+        console.error("Error in generateResponse:", err);
+        throw err;
     }
 }
 

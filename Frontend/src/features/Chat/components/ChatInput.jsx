@@ -1,4 +1,4 @@
-import React from 'react';
+import { useSelector } from 'react-redux';
 
 const ChatInput = ({
   inputText,
@@ -8,6 +8,8 @@ const ChatInput = ({
   setIsProEnabled,
   isMessagesEmpty
 }) => {
+  const { isLoading } = useSelector((state) => state.chat);
+
   return (
     <div className="w-full flex shrink-0 flex-col items-center">
       <form onSubmit={handleSendMessage} className="w-full border border-theme rounded-2xl p-3 sm:p-4 bg-tertiary shadow-sm focus-within:shadow-md focus-within:border-theme transition-all duration-300 relative group">
@@ -22,6 +24,7 @@ const ChatInput = ({
               handleSendMessage(e);
             }
           }}
+          disabled={isLoading}
           rows={isMessagesEmpty ? 2 : 1}
         ></textarea>
 
@@ -29,7 +32,8 @@ const ChatInput = ({
           <div className="flex items-center space-x-2">
             <button
               type="button"
-              className="flex items-center space-x-1.5 px-2 py-1.5 rounded-lg hover:bg-secondary text-text-secondary transition-colors text-sm font-medium cursor-pointer"
+              disabled={isLoading}
+              className="flex items-center space-x-1.5 px-2 py-1.5 rounded-lg hover:bg-secondary text-text-secondary transition-colors text-sm font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               title="Focus"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
@@ -39,7 +43,8 @@ const ChatInput = ({
             </button>
             <button
               type="button"
-              className="flex items-center space-x-1.5 px-2 py-1.5 rounded-lg hover:bg-secondary text-text-secondary transition-colors text-sm font-medium cursor-pointer"
+              disabled={isLoading}
+              className="flex items-center space-x-1.5 px-2 py-1.5 rounded-lg hover:bg-secondary text-text-secondary transition-colors text-sm font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               title="Attach file"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
@@ -55,16 +60,17 @@ const ChatInput = ({
               <button 
                 type="button"
                 onClick={() => setIsProEnabled(!isProEnabled)}
-                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${isProEnabled ? 'bg-custom-primary' : 'bg-primary border-theme'}`}
+                disabled={isLoading}
+                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${isProEnabled ? 'bg-custom-primary' : 'bg-primary border-theme'}`}
               >
                 <span aria-hidden="true" className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-tertiary shadow ring-0 transition duration-200 ease-in-out ${isProEnabled ? 'translate-x-4' : 'translate-x-0'}`} />
               </button>
             </div>
             <button 
               type="submit"
-              disabled={!inputText.trim()}
+              disabled={!inputText.trim() || isLoading}
               className={`p-2 rounded-lg transition-all cursor-pointer ${
-                inputText.trim() 
+                inputText.trim() && !isLoading
                 ? "bg-custom-primary text-white shadow-sm hover:brightness-110" 
                 : "bg-secondary text-text-tertiary cursor-not-allowed"
               }`}
@@ -86,7 +92,8 @@ const ChatInput = ({
           ].map((btn, i) => (
             <button
               key={i}
-              className="flex items-center space-x-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl border border-theme text-text-secondary text-xs sm:text-sm font-medium hover:bg-secondary bg-primary transition-colors shadow-sm cursor-pointer"
+              disabled={isLoading}
+              className="flex items-center space-x-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl border border-theme text-text-secondary text-xs sm:text-sm font-medium hover:bg-secondary bg-primary transition-colors shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={() => setInputText(btn.label)}
             >
               <span className="opacity-70 text-text-tertiary">{btn.icon}</span>

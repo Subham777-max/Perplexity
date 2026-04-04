@@ -5,11 +5,16 @@ import DashboardLayout from '../components/Layout/DashboardLayout';
 
 function Dashboard() {
   const { user } = useAuth();
-  const { initializeSocketConnection } = useChat();
+  
+  // useChat hook automatically initializes socket connection with user token
+  // No need to manually call initializeSocketConnection
+  const { handleSendMessage, handleGetChats, handleOpenChat } = useChat();
   
   useEffect(() => {
-    initializeSocketConnection();
-  }, [initializeSocketConnection]);
+    if (user) {
+      console.log("Dashboard mounted - socket connection initialized in useChat hook");
+    }
+  }, [user]);
 
   return (
     <DashboardLayout />
