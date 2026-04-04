@@ -6,9 +6,10 @@ import ChatHeader from '../ChatHeader';
 import ChatGreeting from '../ChatGreeting';
 import MessageList from '../MessageList';
 import ChatInput from '../ChatInput';
+import Discover from '../Discover';
 
 const MainContent = ({ toggleSidebar, isSidebarOpen }) => {
-  const { currentChatId, chats, isLoading } = useSelector((state) => state.chat);
+  const { currentChatId, chats, isLoading, viewMode } = useSelector((state) => state.chat);
   const messages = currentChatId && chats[currentChatId] ? chats[currentChatId].messages : [];
   
   const [inputText, setInputText] = useState('');
@@ -46,51 +47,59 @@ const MainContent = ({ toggleSidebar, isSidebarOpen }) => {
     <div className="flex flex-col h-full bg-tertiary relative text-primary w-full overflow-hidden">
       <ChatHeader toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
-      {messages.length === 0 ? (
-        /* Original layout when no messages */
-        <main className={`flex-1 overflow-y-auto no-scrollbar flex flex-col p-4 lg:px-10 w-full mx-auto relative justify-center max-w-3xl`}>
-          <ChatGreeting greeting={getGreeting()} />
-          <ChatInput 
-            inputText={inputText}
-            setInputText={setInputText}
-            handleSendMessage={onSubmitMessage}
-            isProEnabled={isProEnabled}
-            setIsProEnabled={setIsProEnabled}
-            isMessagesEmpty={true}
-          />
-        </main>
-      ) : (
-        /* New layout with fixed input at bottom when messages exist */
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <main className="flex-1 overflow-y-auto no-scrollbar flex flex-col p-4 lg:px-10 w-full mx-auto relative max-w-4xl">
-            <MessageList messages={messages} messagesEndRef={messagesEndRef} />
-            
-            {/* Loading indicator while searching */}
-            {isLoading && (
-              <div className="flex items-center space-x-3 mt-6 px-4 py-3 rounded-lg bg-secondary/30">
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 rounded-full bg-custom-primary animate-bounce" style={{ animationDelay: '0s' }}></div>
-                  <div className="w-2 h-2 rounded-full bg-custom-primary animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                  <div className="w-2 h-2 rounded-full bg-custom-primary animate-bounce" style={{ animationDelay: '0.4s' }}></div>
-                </div>
-                <span className="text-sm text-text-secondary font-medium">Searching...</span>
-              </div>
-            )}
-          </main>
-          
-          <div className="shrink-0 border-t border-theme bg-tertiary p-4 lg:px-10 w-full flex justify-center">
-            <div className="w-full max-w-3xl">
+      {/* Show Discover view */}
+      {viewMode === 'discover' && <Discover />}
+
+      {/* Show Chat view */}
+      {viewMode === 'chat' && (
+        <>
+          {messages.length === 0 ? (
+            /* Original layout when no messages */
+            <main className={`flex-1 overflow-y-auto no-scrollbar flex flex-col p-4 lg:px-10 w-full mx-auto relative justify-center max-w-3xl`}>
+              <ChatGreeting greeting={getGreeting()} />
               <ChatInput 
                 inputText={inputText}
                 setInputText={setInputText}
                 handleSendMessage={onSubmitMessage}
                 isProEnabled={isProEnabled}
                 setIsProEnabled={setIsProEnabled}
-                isMessagesEmpty={false}
+                isMessagesEmpty={true}
               />
+            </main>
+          ) : (
+            /* New layout with fixed input at bottom when messages exist */
+            <div className="flex-1 flex flex-col overflow-hidden">
+              <main className="flex-1 overflow-y-auto no-scrollbar flex flex-col p-4 lg:px-10 w-full mx-auto relative max-w-4xl">
+                <MessageList messages={messages} messagesEndRef={messagesEndRef} />
+                
+                {/* Loading indicator while searching */}
+                {isLoading && (
+                  <div className="flex items-center space-x-3 mt-6 px-4 py-3 rounded-lg bg-secondary/30">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 rounded-full bg-custom-primary animate-bounce" style={{ animationDelay: '0s' }}></div>
+                      <div className="w-2 h-2 rounded-full bg-custom-primary animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      <div className="w-2 h-2 rounded-full bg-custom-primary animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                    </div>
+                    <span className="text-sm text-text-secondary font-medium">Searching...</span>
+                  </div>
+                )}
+              </main>
+              
+              <div className="shrink-0 border-t border-theme bg-tertiary p-4 lg:px-10 w-full flex justify-center">
+                <div className="w-full max-w-3xl">
+                  <ChatInput 
+                    inputText={inputText}
+                    setInputText={setInputText}
+                    handleSendMessage={onSubmitMessage}
+                    isProEnabled={isProEnabled}
+                    setIsProEnabled={setIsProEnabled}
+                    isMessagesEmpty={false}
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          )}
+        </>
       )}
     </div>
   );

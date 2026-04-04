@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useAuth } from '../../../Auth/hooks/useAuth';
 import { useChat } from '../../hooks/useChat';
 import { useSelector } from 'react-redux';
-import { setCurrentChatId } from '../../chat.slice';
+import { setCurrentChatId, setViewMode } from '../../chat.slice';
 import { useDispatch } from 'react-redux';
 
 
@@ -19,6 +19,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   const dispatch = useDispatch();
 
   function openChat(chatId){
+    dispatch(setViewMode('chat'));
     handleOpenChat(chatId);
   }
 
@@ -46,23 +47,20 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
       {/* Action Buttons */}
       <div className="space-y-2 mb-6 w-full">
-        <button onClick={()=>dispatch(setCurrentChatId(null))} className="flex items-center justify-between w-full text-left px-3 py-2.5 text-text-primary rounded-lg border border-theme hover:bg-secondary transition-all cursor-pointer group">
+        <button onClick={()=> {
+          dispatch(setCurrentChatId(null));
+          dispatch(setViewMode('chat'));
+        }} className="flex items-center justify-between w-full text-left px-3 py-2.5 text-text-primary rounded-lg border border-theme hover:bg-secondary transition-all cursor-pointer group">
           <div className="flex items-center space-x-3">
              <span className="font-medium text-sm truncate">New Thread</span>
           </div>
           <span className="text-text-secondary group-hover:text-text-primary text-lg leading-none shrink-0">+</span>
         </button>
-        <button className="flex items-center space-x-3 w-full text-left px-3 py-2 text-text-primary rounded-lg hover:bg-secondary transition-all cursor-pointer">
+        <button onClick={() => dispatch(setViewMode('discover'))} className="flex items-center space-x-3 w-full text-left px-3 py-2 text-text-primary rounded-lg hover:bg-secondary transition-all cursor-pointer">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 shrink-0 text-text-secondary">
             <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
           </svg>
           <span className="font-medium text-sm truncate">Discover</span>
-        </button>
-         <button className="flex items-center space-x-3 w-full text-left px-3 py-2 text-text-primary rounded-lg hover:bg-secondary transition-all cursor-pointer">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 shrink-0 text-text-secondary">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-          </svg>
-          <span className="font-medium text-sm truncate">Library</span>
         </button>
       </div>
 

@@ -5,6 +5,7 @@ const chatSlice = createSlice({
     initialState:{
         chats: {},
         currentChatId: null,
+        viewMode: "chat", // "chat" | "discover"
         isLoading: false,
         error: null,
     },
@@ -103,6 +104,9 @@ const chatSlice = createSlice({
                 }
             }
         },
+        setViewMode: (state, action) => {
+            state.viewMode = action.payload; // "chat" or "discover"
+        },
     }
 })
 
@@ -115,6 +119,7 @@ export const {
     addNewMessages, 
     addMessages,
     setStreamingMessage,
-    completeMessage
+    completeMessage,
+    setViewMode
 } = chatSlice.actions;
 export default chatSlice.reducer;
