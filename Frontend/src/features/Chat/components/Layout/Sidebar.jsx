@@ -4,10 +4,12 @@ import { useChat } from '../../hooks/useChat';
 import { useSelector } from 'react-redux';
 import { setCurrentChatId, setViewMode } from '../../chat.slice';
 import { useDispatch } from 'react-redux';
+import { useIsMobile } from '../../../../hooks/useIsMobile';
 
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const { user } = useAuth() || {};
+  const isMobile = useIsMobile();
   const { handleGetChats , handleOpenChat } = useChat();
   const { chats } = useSelector((state) => state.chat);
   console.log(chats)
@@ -22,7 +24,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     dispatch(setViewMode('chat'));
     handleOpenChat(chatId);
   }
-
+  // console.log('Sidebar render - isOpen:', isOpen, 'isMobile:', isMobile);
   return (
     <aside
       className={`absolute md:relative flex flex-col shrink-0 bg-primary h-full transition-all duration-300 ease-in-out z-50 ${
@@ -50,6 +52,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         <button onClick={()=> {
           dispatch(setCurrentChatId(null));
           dispatch(setViewMode('chat'));
+          isMobile && toggleSidebar();
         }} className="flex items-center justify-between w-full text-left px-3 py-2.5 text-text-primary rounded-lg border border-theme hover:bg-secondary transition-all cursor-pointer group">
           <div className="flex items-center space-x-3">
              <span className="font-medium text-sm truncate">New Thread</span>
@@ -72,7 +75,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <button 
               key={idx} 
               className="block w-full text-left px-3 py-2 text-sm text-text-secondary hover:bg-(--secondary-color) hover:text-text-primary rounded-lg truncate transition-all cursor-pointer"
-              onClick={() => openChat(chat.id)}
+              onClick={() => {
+                openChat(chat.id);
+                isMobile && toggleSidebar();
+              }}
             >
               {chat.title || `Chat ${idx + 1}`}
             </button>

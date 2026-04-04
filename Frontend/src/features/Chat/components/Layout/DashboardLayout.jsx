@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Sidebar from './Sidebar';
 import MainContent from './MainContent';
+import { useIsMobile } from '../../../../hooks/useIsMobile';
 
 const DashboardLayout = ({ children }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const isMobile = useIsMobile();
+    const [isSidebarOpen, setIsSidebarOpen] = useState(!isMobile);
 
+    useEffect(() => {
+      setIsSidebarOpen(!isMobile);
+    }, [isMobile]);
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
