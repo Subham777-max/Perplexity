@@ -29,17 +29,24 @@ const agent = createAgent({
     tools: [searchInternetTool],
 })
 
-export async function generateResponse(messages) {
-    const response = await agent.invoke({
-        messages: messages.map(msg =>{
-            if(msg.role === "user"){
-                return new HumanMessage(msg.content);
-            }else if(msg.role === "ai"){
-                return new AIMessage(msg.content);
-            }
+export async function generateResponse(messages , isStream = false){
+    const formattedMessages = messages.map(msg =>{
+        if(msg.role === "user"){
+            return new HumanMessage(msg.content);
+        }else if(msg.role === "ai"){
+            return new AIMessage(msg.content);
+        }
+    })
+    if(isStream){
+        return await agent.stream({
+            messages: formattedMessages,
         })
-    });
-    return response.messages[response.messages.length - 1].text;
+    }else{
+        const response = await agent.invoke({ 
+            messages: formattedMessages,
+        });
+        return response.messages[response.messages.length - 1].text;
+    }
 }
 
 export async function generateChatTitle(message){
