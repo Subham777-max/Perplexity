@@ -102,59 +102,72 @@ export function initSocket(httpserver){
 
 async function streamAiResponse(socket, userId, chatId, messageId, messages, chatTitle) {
     try{
-        console.log("Starting AI response streaming...");
-        const aiResponseStream = await generateResponse(messages, true);
+        console.log("Starting AI response with agent tools...");
+        const fullResponse = await generateResponse(messages, true);
 
-        let fullResponse = "";
-        let chunkCount = 0;
+        console.log("✅ Agent completed, response length:", fullResponse.length);
 
-        // listen to the stream and emit chunks to the client
-        for await (const chunk of aiResponseStream){
-            chunkCount++;
+        if (!fullResponse || fullResponse.trim() === "") {
+            console.warn("❌ No response content received from AI");
+            const fallbackResponse = "I apologize, but I couldn't generate a proper response. Please try again.";
             
-            // The chunk is an AIMessageChunk object - extract the content
-            let chunkText = "";
-            
-            if (typeof chunk === "string") {
-                chunkText = chunk;
-            } else if (chunk?.content) {
-                // AIMessageChunk object has a .content property
-                chunkText = String(chunk.content).trim();
-            } else {
-                chunkText = String(chunk).trim();
-            }
-            
-            if (chunkText && chunkText !== "undefined" && chunkText !== "[object Object]") {
-                fullResponse += chunkText;
+            // Stream the fallback character by character
+            for (let i = 0; i < fallbackResponse.length; i++) {
+                const chunk = fallbackResponse[i];
+                const accumulator = fallbackResponse.substring(0, i + 1);
                 
-                console.log(`✅ Chunk #${chunkCount}:`, { text: chunkText.substring(0, 50), length: chunkText.length, totalLength: fullResponse.length });
-                
-                // Emit the chunk to the specific user
                 io.to(`user_${userId}`).emit("ai:streaming", {
                     messageId: messageId.toString(),
                     chatId: chatId.toString(),
-                    chunk: chunkText,
-                    fullText: fullResponse,
+                    chunk: chunk,
+                    fullText: accumulator,
                 });
             }
+            
+            // Update DB and emit completion
+            await messageModel.findByIdAndUpdate(
+                messageId,
+                { content: fallbackResponse },
+                { returnDocument: "after" }
+            );
+            
+            io.to(`user_${userId}`).emit("ai:message-complete", {
+                messageId: messageId.toString(),
+                chatId: chatId.toString(),
+                content: fallbackResponse,
+                ...(chatTitle && { chatTitle }),
+            });
+            return;
         }
 
-        console.log("✅ Streaming complete. Total chunks:", chunkCount, "Total length:", fullResponse.length);
-
-        // If no response was collected, something went wrong
-        if (!fullResponse || fullResponse.trim() === "") {
-            console.warn("❌ No response content received from AI - generating fallback");
-            fullResponse = "I apologize, but I couldn't generate a proper response. Please try again.";
+        // Stream the response character by character for typing effect
+        console.log("📤 Streaming response character by character...");
+        for (let i = 0; i < fullResponse.length; i++) {
+            const chunk = fullResponse[i];
+            const accumulator = fullResponse.substring(0, i + 1);
+            
+            if (i % 50 === 0) { // Log every 50 characters to avoid spam
+                console.log(`✅ Streamed ${i}/${fullResponse.length} characters`);
+            }
+            
+            io.to(`user_${userId}`).emit("ai:streaming", {
+                messageId: messageId.toString(),
+                chatId: chatId.toString(),
+                chunk: chunk,
+                fullText: accumulator,
+            });
         }
 
-        // Update the message in the database with the full response once streaming is done
+        console.log("✅ Streaming complete. Total length:", fullResponse.length);
+
+        // Update the message in the database with the full response
         const updatedMessage = await messageModel.findByIdAndUpdate(
             messageId,
             { content: fullResponse },
             { returnDocument: "after" }
         );
 
-        console.log("✅ Message updated in database with", fullResponse.length, "characters");
+        console.log("✅ Message updated in database");
 
         // Emit complete message to the client
         io.to(`user_${userId}`).emit("ai:message-complete", {

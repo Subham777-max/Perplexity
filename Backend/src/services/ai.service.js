@@ -40,11 +40,14 @@ export async function generateResponse(messages , isStream = false){
     
     try {
         if(isStream){
-            console.log("Starting model stream with", formattedMessages.length, "messages");
-            // Use the model's stream method for token-level streaming
-            const stream = await mistralModel.stream(formattedMessages);
-            console.log("Stream initialized");
-            return stream;
+            console.log("Starting agent invoke with", formattedMessages.length, "messages (with tools)");
+            // Use invoke to get response with tools, then we'll stream it
+            const response = await agent.invoke({ 
+                messages: formattedMessages,
+            });
+            console.log("Agent invoke complete");
+            const responseText = response.messages[response.messages.length - 1].text;
+            return responseText;
         }else{
             console.log("Starting agent invoke with", formattedMessages.length, "messages");
             const response = await agent.invoke({ 
