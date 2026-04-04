@@ -1,15 +1,14 @@
 import { initializeSocketConnection, sendMessageViaSocket, disconnectSocket, isSocketConnected } from "../services/chat.socket";
-import { sendMessage, fetchChats, fetchChatMessages, deleteChat } from "../services/chat.service";
+import { fetchChats, fetchChatMessages, deleteChat } from "../services/chat.service";
 import { 
     setChats, 
     setCurrentChatId, 
     setLoading, 
     setError, 
-    createNewChat, 
-    addNewMessages, 
+    createNewChat,  
     addMessages
 } from "../chat.slice";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../Auth/hooks/useAuth";
 
