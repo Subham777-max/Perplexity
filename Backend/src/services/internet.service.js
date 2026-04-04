@@ -7,7 +7,7 @@ export async function searchInternet({query}) {
         console.log("Searching internet for query:", query);
         const res = await tvly.search(query,{
             numResults: 5,
-            searchDepth: "advanced",
+            searchDepth: "basic",
         });
         return JSON.stringify(res.results);
     } catch (error) {

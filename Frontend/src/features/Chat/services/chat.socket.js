@@ -5,11 +5,13 @@ import {
     createNewChat,
     setStreamingMessage,
     completeMessage,
-    setError
+    setError,
+    setLoading
 } from "../chat.slice.js";
 
 let socket = null;
 let isAuthenticated = false;
+let isInitializing = false;
 
 // Helper function to get token from cookies
 function getTokenFromCookies() {
@@ -27,10 +29,31 @@ function getTokenFromCookies() {
 }
 
 export function initializeSocketConnection() {
-    if (socket?.connected && isAuthenticated) {
+    // Prevent multiple initialization calls
+    if (isInitializing) {
+        console.log("Socket initialization already in progress");
+        return socket;
+    }
+
+    // If socket is already connected and authenticated, don't reinitialize
+    if (socket && isAuthenticated) {
         console.log("Socket already connected and authenticated");
         return socket;
     }
+
+    // If socket exists but is not authenticated, wait for authentication
+    if (socket && socket.connected && !isAuthenticated) {
+        console.log("Socket connected, waiting for authentication");
+        return socket;
+    }
+
+    // Only create a new socket if one doesn't exist
+    if (socket) {
+        console.log("Socket exists but disconnected, reusing...");
+        return socket;
+    }
+
+    isInitializing = true;
 
     // Get token from cookies
     const authToken = getTokenFromCookies();
@@ -38,6 +61,7 @@ export function initializeSocketConnection() {
     if (!authToken) {
         console.error("No authentication token found in cookies");
         store.dispatch(setError("Authentication token not found. Please login again."));
+        isInitializing = false;
         return null;
     }
 
@@ -88,6 +112,9 @@ export function initializeSocketConnection() {
         const { messageId, chatId, chunk, fullText } = data;
         console.log("Streaming chunk received:", { messageId, chunkLength: chunk.length });
         
+        // Stop showing "Searching..." when streaming starts
+        store.dispatch(setLoading(false));
+        
         // Update Redux with streaming text
         store.dispatch(setStreamingMessage({
             chatId,
@@ -122,6 +149,7 @@ export function initializeSocketConnection() {
         const { chatId, error } = data;
         console.error("AI Error from server:", error);
         store.dispatch(setError(error));
+        store.dispatch(setLoading(false));
     });
 
     socket.on("disconnect", () => {
@@ -135,6 +163,7 @@ export function initializeSocketConnection() {
         store.dispatch(setError("Connection error: " + error.message));
     });
 
+    isInitializing = false;
     return socket;
 }
 

@@ -89,12 +89,12 @@ export function useChat(){
             // 1. "message:user-added" - adds user message to chat
             // 2. "ai:streaming" - updates AI message in real-time with typing effect
             // 3. "ai:message-complete" - finalizes AI message and updates chat title
+            // NOTE: Loading state is kept true until ai:message-complete event arrives
             
         } catch (err) {
             console.error("Send message error:", err.message, err);
             const errorMsg = err.message || "Failed to send message";
             dispatch(setError(errorMsg));
-        } finally {
             dispatch(setLoading(false));
         }
     }
